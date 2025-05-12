@@ -5,6 +5,7 @@ import { Hono } from 'hono'
 import type { RouteConfig } from 'openapi-ts-define'
 import { ROUTES_DIR } from './config'
 import { IS_DEV_MODE } from './env'
+import { pathToFileURL } from 'node:url'
 
 export async function registerOpenapiRoutes(app: Hono) {
   const config = await getOpenapiConfig()
@@ -18,9 +19,9 @@ export async function registerOpenapiRoutes(app: Hono) {
 
 async function getOpenapiConfig() {
   if (IS_DEV_MODE) {
-    // Use a variable to avoid tsup to compile scripts/*.ts
-    const makeItOnlyWorksAtDevMode = '../scripts/utils'
-    const { generateOpenapiConfig } = await import(makeItOnlyWorksAtDevMode)
+    const sourceFiles = import.meta.resolve('../scripts/utils')
+
+    const { generateOpenapiConfig } = await import(sourceFiles)
 
     console.log('generating openapi config...')
     const result = generateOpenapiConfig()
@@ -43,10 +44,9 @@ async function registerRoutes(routes: RouteConfig[]) {
   const _app = new Hono()
 
   for (const route of routes) {
-    const jsFile = path.join(
-      ROUTES_DIR,
-      route.meta.filepath.replace(/\.ts$/, '.js'),
-    )
+    const jsFile = pathToFileURL(
+      path.join(ROUTES_DIR, route.meta.filepath.replace(/\.ts$/, '.js')),
+    ).toString()
 
     const handler = (await import(jsFile)).default
 
