@@ -11,9 +11,9 @@ export function generateOpenapiConfig() {
     openAPI: {
       info: {
         version: '1.0.0',
-        title: 'test spec'
-      }
-    }
+        title: 'test spec',
+      },
+    },
   })
 
   return result

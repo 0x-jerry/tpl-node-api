@@ -1,10 +1,10 @@
-import { Hono } from 'hono'
-import path from 'path'
-import type { RouteConfig } from 'openapi-ts-define'
-import { readFile } from 'fs/promises'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import { swaggerUI } from '@hono/swagger-ui'
-import { IS_DEV_MODE } from './env'
+import { Hono } from 'hono'
+import type { RouteConfig } from 'openapi-ts-define'
 import { ROUTES_DIR } from './config'
+import { IS_DEV_MODE } from './env'
 
 export async function registerOpenapiRoutes(app: Hono) {
   const config = await getOpenapiConfig()
@@ -30,12 +30,12 @@ async function getOpenapiConfig() {
 
   const openapiJsonContent = await readFile('generated/openapi.json', 'utf8')
   const routes: RouteConfig[] = JSON.parse(
-    await readFile('generated/routes.json', 'utf8')
+    await readFile('generated/routes.json', 'utf8'),
   )
 
   return {
     schema: JSON.parse(openapiJsonContent),
-    routes
+    routes,
   }
 }
 
@@ -45,7 +45,7 @@ async function registerRoutes(routes: RouteConfig[]) {
   for (const route of routes) {
     const jsFile = path.join(
       ROUTES_DIR,
-      route.meta.filepath.replace(/\.ts$/, '.js')
+      route.meta.filepath.replace(/\.ts$/, '.js'),
     )
 
     const handler = (await import(jsFile)).default

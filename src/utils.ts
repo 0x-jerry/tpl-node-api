@@ -1,4 +1,4 @@
-import type { Handler, Context } from 'hono'
+import type { Context, Handler } from 'hono'
 
 export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
   const handler: Handler = async (ctx) => {
@@ -8,10 +8,11 @@ export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
     const requestParams = {
       query: ctx.req.query(),
       params: ctx.req.param(),
-      body: isSimpleRequest(ctx.req.method) ? {} : await ctx.req.json()
+      body: isSimpleRequest(ctx.req.method) ? {} : await ctx.req.json(),
     }
 
     try {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       const resp = await route(requestParams as any, ctx)
 
       if (resp instanceof Response) {
@@ -22,7 +23,7 @@ export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
     } catch (error) {
       console.error(error)
       return ctx.json({
-        error: String(error)
+        error: String(error),
       })
     }
   }
@@ -30,6 +31,7 @@ export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
   return handler
 }
 
-export interface RouteDefinition<Req, Resp> {
-  (req: Req, ctx: Context): Resp | Promise<Resp>
-}
+export type RouteDefinition<Req, Resp> = (
+  req: Req,
+  ctx: Context,
+) => Resp | Promise<Resp>

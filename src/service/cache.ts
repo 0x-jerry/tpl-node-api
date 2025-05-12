@@ -11,12 +11,12 @@ export interface FetchWithCacheOption {
 
 export async function fetchContentWithCache<T = unknown>(
   url: string,
-  opt?: FetchWithCacheOption
+  opt?: FetchWithCacheOption,
 ): Promise<T | null> {
   const cache = await prisma.cache.findFirst({
     where: {
-      key: url
-    }
+      key: url,
+    },
   })
 
   const ttl = opt?.ttl ?? 30 * 24 * 60 * 60 * 1000
@@ -31,15 +31,15 @@ export async function fetchContentWithCache<T = unknown>(
 
     await prisma.cache.upsert({
       update: {
-        value: result
+        value: result,
       },
       create: {
         key: url,
-        value: result
+        value: result,
       },
       where: {
-        key: url
-      }
+        key: url,
+      },
     })
   }
 
