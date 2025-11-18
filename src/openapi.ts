@@ -1,11 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { swaggerUI } from '@hono/swagger-ui'
 import { Hono } from 'hono'
 import type { RouteConfig } from 'openapi-ts-define'
 import { ROUTES_DIR } from './config'
 import { IS_DEV_MODE } from './env'
-import { pathToFileURL } from 'node:url'
 
 export async function registerOpenapiRoutes(app: Hono) {
   const config = await getOpenapiConfig()
